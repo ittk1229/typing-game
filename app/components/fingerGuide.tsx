@@ -55,13 +55,14 @@ interface HandProps {
 
 // 片手を描画
 const Hand = ({ hand, nextFingerId }: HandProps) => {
+  console.log(nextFingerId);
   return (
     <div className={`${styles.hand}`}>
       {hand.fingers.map((finger) => (
         <div
           key={finger.id}
           className={`${styles.finger} ${styles[finger.fingerType]} ${
-            nextFingerId && finger.id === nextFingerId ? styles.nextFinger : ""
+            nextFingerId != null && finger.id == nextFingerId ? styles.nextFinger : ""
           }`}
         ></div>
       ))}

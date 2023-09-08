@@ -6,12 +6,23 @@ import Keyboard from "../components/keyboard";
 
 export default function Game() {
   const promptTexts = ["the quick brown fox", "jumps over", "the lazy dog."];
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
-  const [isDone, setIsDone] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [hasDone, setHasDone] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+
   const [wrongKey, setWrongKey] = useState(null);
 
   const handleKeyPress = (e) => {
+    // ゲームが始まっていない場合は、ゲームを始める
+    if (!hasStarted) {
+      setHasStarted(true);
+      return;
+    } else if (hasDone) {
+      return;
+    }
+
     const currentPrompt = promptTexts[currentPromptIndex];
 
     if (e.key === currentPrompt[currentIndex]) {
@@ -22,7 +33,7 @@ export default function Game() {
       if (newCurrentIndex === currentPrompt.length) {
         setCurrentIndex(0);
         if (currentPromptIndex + 1 === promptTexts.length) {
-          setIsDone(true);
+          setHasDone(true);
         } else {
           setCurrentPromptIndex((prevIndex) => prevIndex + 1);
         }
@@ -60,21 +71,21 @@ export default function Game() {
     </span>
   );
 
-  const nextKey = promptTexts[currentPromptIndex][currentIndex];
+  // 開始前と終了後はキーを表示しない
+  const nextKey = hasStarted && !hasDone ? promptTexts[currentPromptIndex][currentIndex] : null;
 
   return (
     <>
       <div className="flex flex-col justify-center items-center h-screen" onKeyDown={handleKeyPress} tabIndex="0">
-        {/*<p>タイピングゲーム</p>*/}
+        <>
+          <p className="mb-5">
+            Sentences：{currentPromptIndex + 1} / {promptTexts.length}
+          </p>
 
-        <p className="mb-5">
-          現在のお題：{currentPromptIndex + 1} / {promptTexts.length}
-        </p>
-
-        <div>
-          <p className="text-3xl mb-5">{isDone ? "Done!" : highlightedPromptText}</p>
-        </div>
-
+          <div>
+            <p className="text-3xl mb-5">{hasDone ? "Done!" : hasStarted ? highlightedPromptText : "Press any key"}</p>
+          </div>
+        </>
         <Keyboard nextKey={nextKey} wrongKey={wrongKey} />
         <FingerGuide nextKey={nextKey} />
       </div>
