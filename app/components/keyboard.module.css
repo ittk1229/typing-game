@@ -7,7 +7,7 @@
 }
 
 .key {
-  @apply border border-gray-400 p-2 m-1 text-center rounded;
+  @apply border border-gray-400 w-12 h-12 p-2 m-1 flex items-center justify-center rounded text-xl;
   font-family: "Courier New", monospace;
 }
 

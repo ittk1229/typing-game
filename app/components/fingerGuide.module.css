@@ -1,10 +1,19 @@
+.hand {
+  @apply flex justify-center m-2;
+}
+
 .finger {
-  @apply w-5 h-12 bg-gray-300 m-1 flex items-center justify-center;
+  @apply w-7 h-20 m-1 flex items-center justify-center bg-gray-300;
 }
 
 .thumb {
-  @apply w-5 h-4 bg-gray-300 m-1 flex items-center justify-center mt-auto;
+  @apply h-8 mt-auto;
 }
+
+.pinky {
+  @apply h-14 mt-auto;
+}
+
 .nextFinger {
   @apply bg-green-400;
 }
