@@ -1,0 +1,24 @@
+.keyboard {
+  @apply mt-4;
+}
+
+.row {
+  @apply flex mb-2 justify-center;
+}
+
+.key {
+  @apply border border-gray-400 p-2 m-1 text-center rounded;
+  font-family: "Courier New", monospace;
+}
+
+.nextKey {
+  @apply text-green-400;
+}
+
+.spaceKey {
+  @apply w-48;
+}
+
+.wrongKey {
+  @apply text-red-400;
+}
