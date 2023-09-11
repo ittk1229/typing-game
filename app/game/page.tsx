@@ -83,7 +83,9 @@ export default function Game() {
           </p>
 
           <div>
-            <p className="text-3xl mb-5">{hasDone ? "Done!" : hasStarted ? highlightedPromptText : "Press any key"}</p>
+            <p className="text-3xl mb-5">
+              {hasDone ? "Done!" : hasStarted ? highlightedPromptText : "Press any key to start"}
+            </p>
           </div>
         </>
         <Keyboard nextKey={nextKey} wrongKey={wrongKey} />
