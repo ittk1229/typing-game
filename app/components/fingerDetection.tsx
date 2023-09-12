@@ -1,49 +1,70 @@
-import { useEffect } from "react";
+import { Camera } from "@mediapipe/camera_utils";
+import { Hands, Results } from "@mediapipe/hands";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
+import { drawCanvas } from "../utils/drawCanvas";
 
-const FingerDetection = () => {
-  useEffect(() => {
-    const initHandLandmarker = async () => {
-      const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-      );
+const App = () => {
+  const webcamRef = useRef<Webcam>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [results, setResults] = useState<Results | null>(null);
 
-      const handLandmarker = await HandLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath: "hand_landmarker.task",
-        },
-        numHands: 2,
-      });
+  const initializeHands = () => {
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+    });
 
-      await handLandmarker.setOptions({ runningMode: "video" });
+    hands.setOptions({
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
 
-      let lastVideoTime = -1;
+    hands.onResults(onResults);
+    return hands;
+  };
 
-      const renderLoop = () => {
-        const video = document.getElementById("video");
-
-        if (video.currentTime !== lastVideoTime) {
-          const detections = handLandmarker.detectForVideo(video);
-          processResults(detections);
-          lastVideoTime = video.currentTime;
-        }
-
-        requestAnimationFrame(() => {
-          renderLoop();
-        });
-      };
-
-      renderLoop();
-    };
-
-    initHandLandmarker();
+  const onResults = useCallback((newResults: Results) => {
+    setResults(newResults);
+    const canvasCtx = canvasRef.current?.getContext("2d");
+    if (canvasCtx) {
+      drawCanvas(canvasCtx, newResults);
+    }
   }, []);
+
+  useEffect(() => {
+    const hands = initializeHands();
+
+    if (webcamRef.current) {
+      const camera = new Camera(webcamRef.current.video!, {
+        onFrame: () => hands.send({ image: webcamRef.current!.video! }),
+        width: 640,
+        height: 360,
+      });
+      camera.start();
+    }
+
+    // Cleanup function
+    return () => {
+      hands?.close();
+    };
+  }, [onResults]);
 
   return (
     <div>
-      <p>Finger Detection</p>
-      <video id="video" width="200" height="200" autoPlay></video>
+      <Webcam
+        audio={false}
+        style={{ display: "none" }}
+        width={640}
+        height={360}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        videoConstraints={{ width: 640, height: 360, facingMode: "user" }}
+      />
+      <canvas ref={canvasRef} width={640} height={360} />
     </div>
   );
 };
 
-export default FingerDetection;
+export default App;
