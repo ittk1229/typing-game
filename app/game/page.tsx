@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FingerDetection from "../components/fingerDetection";
 import FingerGuide from "../components/fingerGuide";
 import Keyboard from "../components/keyboard";
 
@@ -90,6 +91,7 @@ export default function Game() {
         </>
         <Keyboard nextKey={nextKey} wrongKey={wrongKey} />
         <FingerGuide nextKey={nextKey} />
+        <FingerDetection />
       </div>
     </>
   );
