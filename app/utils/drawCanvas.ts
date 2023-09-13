@@ -8,8 +8,8 @@ export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
   ctx.save();
   ctx.clearRect(0, 0, width, height);
   // canvas の左右反転
-  ctx.scale(-1, 1);
-  ctx.translate(-width, 0);
+  // ctx.scale(-1, 1);
+  // ctx.translate(-width, 0);
   // capture image の描画
   ctx.drawImage(results.image, 0, 0, width, height);
   // 手の描画
@@ -18,11 +18,6 @@ export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
     for (const landmarks of results.multiHandLandmarks) {
       drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 1 });
       drawLandmarks(ctx, landmarks, { color: "#FF0000", lineWidth: 1, radius: 2 });
-
-      // 指の座標を出力
-      // landmarks.forEach((point, index) => {
-      //   console.log(`Landmark ${index}: (${point.x}, ${point.y}, ${point.z})`);
-      // });
     }
   }
   ctx.restore();

@@ -2,6 +2,7 @@ import { Camera } from "@mediapipe/camera_utils";
 import { Hands, Results } from "@mediapipe/hands";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import { FingerId } from "../game/page";
 import { drawCanvas } from "../utils/drawCanvas";
 
 const FingerDetection = ({ setFingerCoordinates }) => {
@@ -33,15 +34,29 @@ const FingerDetection = ({ setFingerCoordinates }) => {
         drawCanvas(canvasCtx, newResults);
       }
 
-      // Extract and output finger coordinates
-      const fingerCoordinates = newResults.multiHandLandmarks?.map((hand) => {
-        return {
-          thumb: { x: hand[4].x, y: hand[4].y },
-          indexFinger: { x: hand[8].x, y: hand[8].y },
-          middleFinger: { x: hand[12].x, y: hand[12].y },
-          ringFinger: { x: hand[16].x, y: hand[16].y },
-          pinky: { x: hand[20].x, y: hand[20].y },
-        };
+      // Initialize fingerCoordinates with null values
+      const fingerCoordinates = {
+        [FingerId.LeftPinky]: null,
+        [FingerId.LeftRing]: null,
+        [FingerId.LeftMiddle]: null,
+        [FingerId.LeftIndex]: null,
+        [FingerId.LeftThumb]: null,
+        [FingerId.RightThumb]: null,
+        [FingerId.RightIndex]: null,
+        [FingerId.RightMiddle]: null,
+        [FingerId.RightRing]: null,
+        [FingerId.RightPinky]: null,
+      };
+
+      // Update fingerCoordinates with detected values
+      newResults.multiHandLandmarks?.forEach((hand, index) => {
+        // 逆...
+        const isLeftHand = newResults.multiHandedness[index].label === "Right";
+        fingerCoordinates[isLeftHand ? FingerId.LeftThumb : FingerId.RightThumb] = { x: hand[4].x, y: hand[4].y };
+        fingerCoordinates[isLeftHand ? FingerId.LeftIndex : FingerId.RightIndex] = { x: hand[8].x, y: hand[8].y };
+        fingerCoordinates[isLeftHand ? FingerId.LeftMiddle : FingerId.RightMiddle] = { x: hand[12].x, y: hand[12].y };
+        fingerCoordinates[isLeftHand ? FingerId.LeftRing : FingerId.RightRing] = { x: hand[16].x, y: hand[16].y };
+        fingerCoordinates[isLeftHand ? FingerId.LeftPinky : FingerId.RightPinky] = { x: hand[20].x, y: hand[20].y };
       });
 
       // Pass the coordinates to the parent component

@@ -1,17 +1,17 @@
 import styles from "./keyboard.module.css";
 
 interface KeyboardProps {
-  nextKey: string;
+  nextKey: string | null;
   wrongKey: string | null;
 }
 
-const Keyboard = ({ nextKey, wrongKey }: KeyboardProps) => {
-  const rows = [
-    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-    ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"],
-    ["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
-  ];
+const rows = [
+  ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+  ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"],
+  ["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
+];
 
+const Keyboard = ({ nextKey, wrongKey }: KeyboardProps) => {
   return (
     <div className={styles.keyboard}>
       {rows.map((row, rowIndex) => (

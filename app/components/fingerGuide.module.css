@@ -17,3 +17,7 @@
 .nextFinger {
   @apply bg-green-400;
 }
+
+.wrongFinger {
+  @apply bg-red-400;
+}
