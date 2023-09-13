@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { drawCanvas } from "../utils/drawCanvas";
 
-const App = () => {
+const FingerDetection = ({ setFingerCoordinates }) => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [results, setResults] = useState<Results | null>(null);
@@ -25,29 +25,57 @@ const App = () => {
     return hands;
   };
 
-  const onResults = useCallback((newResults: Results) => {
-    setResults(newResults);
-    const canvasCtx = canvasRef.current?.getContext("2d");
-    if (canvasCtx) {
-      drawCanvas(canvasCtx, newResults);
-    }
-  }, []);
+  const onResults = useCallback(
+    (newResults: Results) => {
+      setResults(newResults);
+      const canvasCtx = canvasRef.current?.getContext("2d");
+      if (canvasCtx) {
+        drawCanvas(canvasCtx, newResults);
+      }
+
+      // Extract and output finger coordinates
+      const fingerCoordinates = newResults.multiHandLandmarks?.map((hand) => {
+        return {
+          thumb: { x: hand[4].x, y: hand[4].y },
+          indexFinger: { x: hand[8].x, y: hand[8].y },
+          middleFinger: { x: hand[12].x, y: hand[12].y },
+          ringFinger: { x: hand[16].x, y: hand[16].y },
+          pinky: { x: hand[20].x, y: hand[20].y },
+        };
+      });
+
+      // Pass the coordinates to the parent component
+      setFingerCoordinates(fingerCoordinates);
+    },
+    [setFingerCoordinates]
+  );
 
   useEffect(() => {
     const hands = initializeHands();
 
     if (webcamRef.current) {
       const camera = new Camera(webcamRef.current.video!, {
-        onFrame: () => hands.send({ image: webcamRef.current!.video! }),
+        onFrame: async () => {
+          try {
+            await hands.send({ image: webcamRef.current!.video! });
+          } catch (error) {
+            console.error("Failed to send image:", error);
+          }
+        },
         width: 640,
         height: 360,
       });
-      camera.start();
+
+      try {
+        camera.start();
+      } catch (error) {
+        console.error("Failed to start camera:", error);
+      }
     }
 
-    // Cleanup function
     return () => {
-      hands?.close();
+      hands.close();
+      // Add any additional cleanup logic here if needed
     };
   }, [onResults]);
 
@@ -67,4 +95,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default FingerDetection;

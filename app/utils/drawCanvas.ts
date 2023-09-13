@@ -1,12 +1,6 @@
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS, Results } from "@mediapipe/hands";
 
-/**
- * cnavasに描画する
- * @param ctx canvas context
- * @param results 手の検出結果
- */
-
 export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
@@ -24,6 +18,11 @@ export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
     for (const landmarks of results.multiHandLandmarks) {
       drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 1 });
       drawLandmarks(ctx, landmarks, { color: "#FF0000", lineWidth: 1, radius: 2 });
+
+      // 指の座標を出力
+      // landmarks.forEach((point, index) => {
+      //   console.log(`Landmark ${index}: (${point.x}, ${point.y}, ${point.z})`);
+      // });
     }
   }
   ctx.restore();

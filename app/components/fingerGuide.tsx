@@ -55,7 +55,6 @@ interface HandProps {
 
 // 片手を描画
 const Hand = ({ hand, nextFingerId }: HandProps) => {
-  console.log(nextFingerId);
   return (
     <div className={`${styles.hand}`}>
       {hand.fingers.map((finger) => (
