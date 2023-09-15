@@ -88,8 +88,8 @@ const onClickImage = (evt: React.MouseEvent<HTMLImageElement>) => {
 
 // 解像度は実際の処理に合わせて変更希望
 const videoConstraints = {
-  width: 1920,
-  height: 1080,
+  width: 640,
+  height: 360,
 };
 
 type Point = { x: number; y: number };

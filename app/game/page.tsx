@@ -148,7 +148,7 @@ export default function Game() {
       return;
     }
 
-    if (fingerCoordinates && nextKey !== " ") {
+    if (fingerCoordinates && nextKey !== " " && key2position[e.key]) {
       const nearest_finger = get_nearest_finger(key2position, fingerCoordinates, e.key);
       if (key2fingerId[e.key] !== Number(nearest_finger)) {
         setWrongFingerId(Number(nearest_finger));
