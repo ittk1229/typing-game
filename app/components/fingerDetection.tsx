@@ -18,8 +18,8 @@ const FingerDetection = ({ setFingerCoordinates }) => {
     hands.setOptions({
       maxNumHands: 2,
       modelComplexity: 1,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
+      minDetectionConfidence: 0.25,
+      minTrackingConfidence: 0.25,
     });
 
     hands.onResults(onResults);
