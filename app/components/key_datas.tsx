@@ -6,11 +6,11 @@ type coordinate = {
 }
 // get_key_pos.pyに合わせる
 type keyData = {
-  one: coordinate,
+  q: coordinate,
   z: coordinate,
   ques: coordinate,
-  zero: coordinate,
+  p: coordinate,
 }
 // const inputImageRef = useRef<keyData | null>(null);
-let inputImageRef: keyData = {one: {x: 0, y: 0}, z: {x: 0, y: 0}, ques: {x: 0, y: 0}, zero: {x: 0, y: 0}};
+let inputImageRef: keyData = {q: {x: 0, y: 0}, z: {x: 0, y: 0}, ques: {x: 0, y: 0}, p: {x: 0, y: 0}};
 export default inputImageRef;

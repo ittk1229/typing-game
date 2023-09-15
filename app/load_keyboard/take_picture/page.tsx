@@ -4,7 +4,7 @@ import Link from "next/link";
 // https://stackoverflow.com/questions/67645676/new-image-in-next-js
 import NextImage from "next/image";
 import cv from "opencv-ts";
-import { useCallback, useEffect, useRef, useState, createContext } from "react";
+import { useCallback, useRef, useState } from "react";
 // key_datas.tsxのrefをそのまま使います。{}を取り除きました。
 // https://zenn.dev/hirof1990/scraps/a0ac0ea372cf02
 import inputImageRef from "../../components/key_datas";
@@ -15,19 +15,23 @@ import Webcam from "react-webcam";
 import Select from "react-select";
 // assert文が使いたかっただけ
 import assert from "assert";
+import {rows} from "../../components/keyboard";
+
 // 全てAndを取ることで、全ての座標が取得できたかを判定する
 const finishFlag = {
-  one: false,
+  q: false,
   z: false,
   ques: false,
-  zero: false,
+  p: false,
 };
+
 const options = [
-  { value: "1", label: finishFlag.one ? "1(OK)" : "1" },
+  { value: "q", label: finishFlag.q ? "1(OK)" : "q" },
   { value: "z", label: finishFlag.z ? "z(OK)" : "z" },
   { value: "?", label: finishFlag.ques ? "?(OK)" : "?" },
-  { value: "0", label: finishFlag.zero ? "0(OK)" : "0" },
+  { value: "p", label: finishFlag.p ? "0(OK)" : "p" },
 ];
+
 const colors = {
   red: new cv.Scalar(0, 0, 255, 255),
   orange: new cv.Scalar(0, 165, 255, 255),
@@ -37,8 +41,10 @@ const colors = {
   lightBlue: new cv.Scalar(255, 0, 0, 255),
   blue: new cv.Scalar(255, 0, 165, 255),
   purple: new cv.Scalar(255, 0, 255, 255),
-}
+};
+
 let nowState = "1";
+
 // inputImageRefの使い方がわかんない
 const onClickImage = (evt: React.MouseEvent<HTMLImageElement>) => {
   // https://qiita.com/AtsushiEsashika/items/1ba3d078a88c3255760b
@@ -51,10 +57,10 @@ const onClickImage = (evt: React.MouseEvent<HTMLImageElement>) => {
     //   }
     //   break;
     // みたいに書く(変えたが)
-    case "1":
-      inputImageRef.one.x = evt.nativeEvent.offsetX;
-      inputImageRef.one.y = evt.nativeEvent.offsetY;
-      finishFlag.one = true;
+    case "q":
+      inputImageRef.q.x = evt.nativeEvent.offsetX;
+      inputImageRef.q.y = evt.nativeEvent.offsetY;
+      finishFlag.q = true;
       // alert(nowState);
       // alert(inputImageRef.one.x);
       // alert(inputImageRef.one.y);
@@ -69,21 +75,43 @@ const onClickImage = (evt: React.MouseEvent<HTMLImageElement>) => {
       inputImageRef.ques.y = evt.nativeEvent.offsetY;
       finishFlag.ques = true;
       break;
-    case "0":
-      inputImageRef.zero.x = evt.nativeEvent.offsetX;
-      inputImageRef.zero.y = evt.nativeEvent.offsetY;
-      finishFlag.zero = true;
+    case "p":
+      inputImageRef.p.x = evt.nativeEvent.offsetX;
+      inputImageRef.p.y = evt.nativeEvent.offsetY;
+      finishFlag.p = true;
       break;
     default:
       // 想定していない
       assert(false);
   }
 };
+
 // 解像度は実際の処理に合わせて変更希望
 const videoConstraints = {
   width: 1920,
   height: 1080,
 };
+
+type Point = { x: number; y: number };
+
+const normalize = (point: Point, width: number, height: number): Point => {
+  return { x: point.x / width, y: point.y / height };
+};
+
+const mulObj = (point: Point, mul: number): Point => {
+  return { x: point.x * mul, y: point.y * mul };
+};
+
+const addObj = (point1: Point, point2: Point): Point => {
+  return { x: point1.x + point2.x, y: point1.y + point2.y };
+};
+
+const dist = (point1: Point, point2: Point): number => {
+  return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+};
+
+const key2position = {};
+
 // ページ
 const CameraComponent = () => {
   // Step1
@@ -101,14 +129,40 @@ const CameraComponent = () => {
   const drawCircles = () => {
     // 元の画像を取得 -> 画像に丸を描画していく
     let image = new Image();
-    if(url) image.src = url;
+    if (url) image.src = url;
+
     let imageMat = cv.imread(image);
+    // console.log(imageMat.cols, imageMat.rows);
+
+    // Initialize positions
+    const positions: Point[][] = Array.from({ length: 3 }, () =>
+      Array.from({ length: 10 }, () => ({ x: 0.0, y: 0.0 }))
+    );
+
+    // Set corner points
+    positions[0][0] = inputImageRef.q;
+    positions[2][0] = inputImageRef.z;
+    positions[2][9] = inputImageRef.ques;
+    positions[0][9] = inputImageRef.p;
+
+    // Fill in the remaining points for rows 0 and 2
+    for (let i = 1; i < 9; i++) {
+      positions[0][i] = addObj(mulObj(positions[0][0], 1 - i / 9), mulObj(positions[0][9], i / 9));
+      positions[2][i] = addObj(mulObj(positions[2][0], 1 - i / 9), mulObj(positions[2][9], i / 9));
+    }
+
+    // Calculate row 1
+    for (let i = 0; i < 10; i++) {
+      positions[1][i] = mulObj(addObj(positions[0][i], positions[2][i]), 1 / 2);
+    }
+
     // 半径を算出
-    const r = Math.sqrt(Math.abs(inputImageRef.one.x - inputImageRef.z.x)**2 + Math.abs(inputImageRef.one.y - inputImageRef.z.y)**2)/4/2;
+    const r = dist(inputImageRef.q, inputImageRef.z) / 4 / 2;
+
     // 丸を描画
-    for(let i = 0; i < 10; i++){
+    for (let i = 0; i < 10; i++) {
       let drawColor;
-      switch(i){
+      switch (i) {
         case 1:
           drawColor = colors.red;
           break;
@@ -142,16 +196,20 @@ const CameraComponent = () => {
         default:
           assert(false);
       }
-      const origin  = new cv.Point(inputImageRef.one.x, inputImageRef.one.y);
-      const vectorU = new cv.Point((inputImageRef.z.x - inputImageRef.one.x) / 3, (inputImageRef.z.y - inputImageRef.one.y) / 3);
-      const vectorV = new cv.Point((inputImageRef.zero.x - inputImageRef.one.x) / 9, (inputImageRef.zero.y - inputImageRef.one.y) / 9);
-      for(let j = 0; j < 4; j++){
-        const drawPoint = new cv.Point(origin.x + vectorU.x * j + vectorV.x * i, origin.y + vectorU.y * j + vectorV.y * i);
-        cv.circle(imageMat,drawPoint,r,drawColor,2);
+
+      for (let j = 0; j < 3; j++) {
+        const nx = positions[j][i].x;
+        const ny = positions[j][i].y;
+        const drawPoint = new cv.Point(nx, ny);
+        key2position[rows[j][i]] = { x: nx/imageMat.cols, y: ny/imageMat.rows };
+        cv.circle(imageMat, drawPoint, r, drawColor, 2);
       }
     }
-    cv.imshow('keyboard', imageMat);
+
+    localStorage.setItem("key2position", JSON.stringify(key2position));
+    cv.imshow("keyboard", imageMat);
   };
+
   return (
     <div>
       <Link href={"/"}>ホームに戻る</Link>
@@ -169,9 +227,7 @@ const CameraComponent = () => {
       {/* Step2 位置合わせ */}
       {url && (
         <div>
-          <p>
-            次に、画像をクリックして、キーボード(1,Z,?,0)の位置を指定して下さい。
-          </p>
+          <p>次に、画像をクリックして、キーボード(Q,Z,?,P)の位置を指定して下さい。</p>
           <NextImage
             src={url}
             onClick={onClickImage}
@@ -194,15 +250,14 @@ const CameraComponent = () => {
         </div>
       )}
       {/* Step3 結果を確認(OpenCV.jsで結果を描画する) */}
-      {
-        (finishFlag.one && finishFlag.z && finishFlag.ques && finishFlag.zero) &&
+      {finishFlag.q && finishFlag.z && finishFlag.ques && finishFlag.p && (
         <div>
           <p>キーボードの位置を確認してください。もしこれでよければトップに戻ってください。</p>
           <button onClick={drawCircles}>キーボードの位置を確認する</button>
-          <canvas id="keyboard"/>
+          <canvas id="keyboard" />
           <Link href={"/"}>ホームに戻る(これでOK)</Link>
         </div>
-      }
+      )}
     </div>
   );
 };

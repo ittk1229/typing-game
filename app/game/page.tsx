@@ -67,10 +67,8 @@ for (const hand of hands) {
 const promptTexts = ["the quick brown fox", "jumps over", "the lazy dog."];
 
 // dummy
-const keyRange = {
-  // 省略
-  t: { x: [0.3583, 0.3987], y: [0.2319, 0.3008] },
-};
+const key2position = localStorage.getItem("key2position") ? JSON.parse(localStorage.getItem("key2position")) : {};
+console.log(key2position);
 
 const generateHighlightedPromptText = (prompt: string, currentIndex: number, wrongKey: string | null) => {
   return (
@@ -102,11 +100,26 @@ const generateHighlightedPromptText = (prompt: string, currentIndex: number, wro
   );
 };
 
-const isInRange = (coordinate: { x: number; y: number }, range: { x: [number, number]; y: [number, number] }) => {
-  //dummy
-  return (
-    range.x[0] < coordinate.x && coordinate.x < range.x[1] && range.y[0] < coordinate.y && coordinate.y < range.y[1]
-  );
+type Point = { x: number; y: number };
+
+const dist_square = (point1: Point, point2: Point): number => {
+  return (point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2;
+};
+
+const get_nearest_finger = (key2position, fingerCoordinates, key) => {
+  let min_dist = 1000;
+  let nearest_finger = null;
+  for (let fingerId in fingerCoordinates) {
+    const fingerCoordinate = fingerCoordinates[fingerId];
+    if (!fingerCoordinate) {
+      continue;
+    }
+    if (min_dist > dist_square(fingerCoordinate, key2position[key])) {
+      min_dist = dist_square(fingerCoordinate, key2position[key]);
+      nearest_finger = fingerId;
+    }
+  }
+  return nearest_finger;
 };
 
 export default function Game() {
@@ -134,24 +147,12 @@ export default function Game() {
     } else if (hasDone) {
       return;
     }
-    console.log(fingerCoordinates);
 
-    if (fingerCoordinates) {
-      // null や undefined でないことを確認
-      for (let fingerId in fingerCoordinates) {
-        const fingerCoordinate = fingerCoordinates[fingerId];
-
-        if (!fingerCoordinate) {
-          continue;
-        }
-
-        // 違う指で押していたら入力を無視
-        if (isInRange(fingerCoordinate, nextKeyRange)) {
-          if (key2fingerId[e.key] !== Number(fingerId)) {
-            setWrongFingerId(Number(fingerId));
-            return;
-          }
-        }
+    if (fingerCoordinates && nextKey !== " ") {
+      const nearest_finger = get_nearest_finger(key2position, fingerCoordinates, e.key);
+      if (key2fingerId[e.key] !== Number(nearest_finger)) {
+        setWrongFingerId(Number(nearest_finger));
+        return;
       }
     }
 
@@ -177,7 +178,6 @@ export default function Game() {
 
   // 開始前と終了後はキーを表示しない
   const nextKey = hasStarted && !hasDone ? promptTexts[currentPromptIndex][currentIndex] : null;
-  const nextKeyRange = nextKey ? keyRange[nextKey] : null;
   const nextFingerId = nextKey ? key2fingerId[nextKey] : null;
 
   return (
