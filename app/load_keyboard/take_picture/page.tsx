@@ -145,10 +145,18 @@ const CameraComponent = () => {
     positions[2][9] = inputImageRef.ques;
     positions[0][9] = inputImageRef.p;
 
-    // Fill in the remaining points for rows 0 and 2
-    for (let i = 1; i < 9; i++) {
-      positions[0][i] = addObj(mulObj(positions[0][0], 1 - i / 9), mulObj(positions[0][9], i / 9));
-      positions[2][i] = addObj(mulObj(positions[2][0], 1 - i / 9), mulObj(positions[2][9], i / 9));
+    {
+      const dist_q_z = dist(inputImageRef.q, inputImageRef.z);
+      const dist_p_ques = dist(inputImageRef.p, inputImageRef.ques);
+      const ratio_sum = (dist_q_z + dist_p_ques) / 2 * 9;
+      let ratio = 0;
+      // Fill in the remaining points for rows 0 and 2
+      for (let i = 1; i < 9; i++) {
+        ratio += (dist_q_z + (dist_p_ques - dist_q_z) * ((i - 1) / 8));
+        const normalized_ratio = ratio / ratio_sum;
+        positions[0][i] = addObj(mulObj(positions[0][0], 1 - normalized_ratio), mulObj(positions[0][9], normalized_ratio));
+        positions[2][i] = addObj(mulObj(positions[2][0], 1 - normalized_ratio), mulObj(positions[2][9], normalized_ratio));
+      }
     }
 
     // Calculate row 1
