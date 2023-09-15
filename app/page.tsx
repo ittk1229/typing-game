@@ -7,7 +7,7 @@ export default function Home() {
           遊ぶ
       </Link>
 
-      <Link href="/load_keyboard" className="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-4">
+      <Link href="/load_keyboard/take_picture" className="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-4">
           キーボードを読み込む
       </Link>
     </>

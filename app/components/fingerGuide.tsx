@@ -27,10 +27,10 @@ interface Hand {
 const LeftHand: Hand = {
   side: "left",
   fingers: [
-    { id: FingerId.LeftPinky, fingerType: "pinky", keys: ["q", "a", "z"] },
-    { id: FingerId.LeftRing, fingerType: "ring", keys: ["w", "s", "x"] },
-    { id: FingerId.LeftMiddle, fingerType: "middle", keys: ["e", "d", "c"] },
-    { id: FingerId.LeftIndex, fingerType: "index", keys: ["r", "f", "v", "t", "g", "b"] },
+    { id: FingerId.LeftPinky, fingerType: "pinky", keys: ["q", "a", "z"] }, // RED
+    { id: FingerId.LeftRing, fingerType: "ring", keys: ["w", "s", "x"] }, // ORANGE
+    { id: FingerId.LeftMiddle, fingerType: "middle", keys: ["e", "d", "c"] }, // YELLOW
+    { id: FingerId.LeftIndex, fingerType: "index", keys: ["r", "f", "v", "t", "g", "b"] }, // LIGHT GREEN
     { id: FingerId.LeftThumb, fingerType: "thumb", keys: [" "] },
   ],
 };
@@ -39,10 +39,10 @@ const RightHand: Hand = {
   side: "right",
   fingers: [
     { id: FingerId.RightThumb, fingerType: "thumb", keys: [] },
-    { id: FingerId.RightIndex, fingerType: "index", keys: ["y", "h", "n", "u", "j", "m"] },
-    { id: FingerId.RightMiddle, fingerType: "middle", keys: ["i", "k", ","] },
-    { id: FingerId.RightRing, fingerType: "ring", keys: ["o", "l", "."] },
-    { id: FingerId.RightPinky, fingerType: "pinky", keys: ["p", ";", "/"] },
+    { id: FingerId.RightIndex, fingerType: "index", keys: ["y", "h", "n", "u", "j", "m"] }, // GREEN
+    { id: FingerId.RightMiddle, fingerType: "middle", keys: ["i", "k", ","] }, // LIGHT BLUE
+    { id: FingerId.RightRing, fingerType: "ring", keys: ["o", "l", "."] }, // BLUE
+    { id: FingerId.RightPinky, fingerType: "pinky", keys: ["p", ";", "/"] }, // PURPLE
   ],
 };
 
