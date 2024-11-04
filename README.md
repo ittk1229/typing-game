@@ -1,13 +1,13 @@
 ## 打鍵の指が推奨のものと違う場合に指摘するタイピングゲーム
 
-
-![Image from Gyazo](https://i.gyazo.com/b72bc88b899df6a24aa018c0ae27fca0.gif)
-
 - ホームポジションを習得するためのタイピングゲームです！
   - タイピングの際の手元をWebカメラで撮影
   - 表示される文字を入力する際，ホームポジションで推奨される指とは異なる指で打鍵する場合にブザーで指摘
   - 推奨される指で打鍵するまで文字は入力されません
 
+[![Image from Gyazo](https://i.gyazo.com/ef29930ee70db66141c0e13b9b2538b8.png)](https://gyazo.com/ef29930ee70db66141c0e13b9b2538b8)
+
+左人差し指での打鍵が推奨される"T"を右人差し指で打鍵した時の例
 
 ## Getting Started
 
